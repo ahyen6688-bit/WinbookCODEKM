@@ -1,7 +1,7 @@
 import json
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID
+from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID, GROUP_ID
 
 DATA_FILE = "data.json"
 
@@ -14,6 +14,14 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+async def is_member(bot, user_id, chat_id):
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in ["member", "administrator", "creator"]
+    except:
+        return False
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -59,6 +67,23 @@ async def join_km(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = load_data()
     user_id = query.from_user.id
+    bot = context.bot
+
+    # ❌ chưa join kênh
+    if not await is_member(bot, user_id, CHANNEL_ID):
+        await query.edit_message_text(
+            "❌ Bạn CHƯA tham gia KÊNH Telegram.\n"
+            "👉 Vui lòng tham gia kênh rồi quay lại bấm xác nhận."
+        )
+        return
+
+    # ❌ chưa join nhóm
+    if not await is_member(bot, user_id, GROUP_ID):
+        await query.edit_message_text(
+            "❌ Bạn CHƯA tham gia NHÓM CHAT.\n"
+            "👉 Vui lòng tham gia nhóm rồi quay lại bấm xác nhận."
+        )
+        return
 
     # chặn bấm lại
     if user_id in data["users"]:
@@ -70,7 +95,7 @@ async def join_km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("❌ Hết lượt hôm nay. Hẹn bạn ngày mai nha ❤️")
         return
 
-    # nhận KM
+    # ✅ nhận KM
     data["count"] += 1
     data["users"].append(user_id)
     save_data(data)

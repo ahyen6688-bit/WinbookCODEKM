@@ -16,10 +16,15 @@ def save_data(data):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     text = (
-        "🎁 KHUYẾN MÃI HÔM NAY\n"
-        f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
-        "👇 Bấm nút bên dưới để xác nhận nhận KM"
-    )
+    "🤗 CODE 20K – RÚT TỐI ĐA 200K\n\n"
+    "🎁 KHUYẾN MÃI HÔM NAY\n"
+    f"👥 SỐ LƯỢT: {data['count']}/{TOTAL_SLOTS} NGƯỜI\n\n"
+    "📣 YÊU CẦU THAM GIA:\n"
+    "👉 Tham gia kênh: https://t.me/winbookEvent\n"
+    "👉 Tham gia nhóm chat: https://t.me/winbook8888\n"
+    "👉 Like fanpage: https://www.facebook.com/profile.php?id=100076695622884\n\n"
+    "👌 Hoàn thành xong, bấm nút bên dưới và liên hệ Admin để nhận CODE ^^"
+)
 
     keyboard = [[InlineKeyboardButton("✅ XÁC NHẬN NHẬN KM", callback_data="join")]]
     await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))

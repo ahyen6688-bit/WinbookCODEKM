@@ -28,16 +28,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
     text = (
-        "🤗 CODE 20K – RÚT TỐI ĐA 200K\n\n"
-        "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 30 NGƯỜI\n"
-        f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
-        "📣 YÊU CẦU THAM GIA:\n"
-        "1️⃣ Tham gia kênh Telegram\n"
-        "2️⃣ Tham gia nhóm chat\n"
-        "3️⃣ Like fanpage Facebook\n\n"
-        "👇 Hoàn thành xong, bấm nút xác nhận để nhận CODE"
-    )
-
+    "🤗 CODE 20K – RÚT TỐI ĐA 200K\n\n"
+    "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 30 NGƯỜI\n"
+    f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
+    "📣 YÊU CẦU THAM GIA:\n"
+    "1️⃣ Tham gia kênh Telegram\n"
+    "2️⃣ Like fanpage Facebook\n"
+    "3️⃣ Follow TikTok\n\n"
+    "📸 Vui lòng gửi ảnh đã like fanpage + follow TikTok để xác nhận CODE\n\n"
+    "👇 Hoàn thành xong, bấm nút xác nhận để nhận KM"
+)
    keyboard = [
     [
         InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")

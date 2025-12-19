@@ -38,21 +38,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👇 Hoàn thành xong, bấm nút xác nhận để nhận CODE"
     )
 
-    keyboard = [
-        [
-            InlineKeyboardButton("📢 VÀO KÊNH", url="https://t.me/winbookEvent"),
-            InlineKeyboardButton("💬 VÀO NHÓM", url="https://t.me/winbook8888")
-        ],
-        [
-            InlineKeyboardButton(
-                "👍 LIKE FANPAGE",
-                url="https://www.facebook.com/profile.php?id=100076695622884"
-            )
-        ],
-        [
-            InlineKeyboardButton("✅ XÁC NHẬN NHẬN KM", callback_data="join")
-        ]
+   keyboard = [
+    [
+        InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")
+    ],
+    [
+        InlineKeyboardButton(
+            "👍 LIKE FANPAGE",
+            url="https://www.facebook.com/profile.php?id=100076695622884"
+        ),
+        InlineKeyboardButton(
+            "🎵 FOLLOW TIKTOK",
+            url="https://www.tiktok.com/@winbook888?_r=1&_t=ZS-92LwUEoDMPs"
+        )
+    ],
+    [
+        InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
     ]
+]
 
     await update.message.reply_text(
         text,

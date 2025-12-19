@@ -53,6 +53,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     ],
     [
+        InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
+        InlineKeyboardButton("👨‍💼 TELE CS002", url="https://t.me/WinbookCSKH002")
+    ],
+    [
         InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
     ]
 ]

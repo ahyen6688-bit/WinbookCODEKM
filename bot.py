@@ -28,38 +28,39 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
     text = (
-    "🤗 CODE 20K – RÚT TỐI ĐA 200K\n\n"
-    "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 30 NGƯỜI\n"
-    f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
-    "📣 YÊU CẦU THAM GIA:\n"
-    "1️⃣ Tham gia kênh Telegram\n"
-    "2️⃣ Like fanpage Facebook\n"
-    "3️⃣ Follow TikTok\n\n"
-    "📸 Vui lòng gửi ảnh đã like fanpage + follow TikTok để xác nhận CODE\n\n"
-    "👇 Hoàn thành xong, bấm nút xác nhận để nhận KM"
-)
-   keyboard = [
-    [
-        InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")
-    ],
-    [
-        InlineKeyboardButton(
-            "👍 LIKE FANPAGE",
-            url="https://www.facebook.com/profile.php?id=100076695622884"
-        ),
-        InlineKeyboardButton(
-            "🎵 FOLLOW TIKTOK",
-            url="https://www.tiktok.com/@winbook888?_r=1&_t=ZS-92LwUEoDMPs"
-        )
-    ],
-    [
-        InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
-        InlineKeyboardButton("👨‍💼 TELE CS002", url="https://t.me/WinbookCSKH002")
-    ],
-    [
-        InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
+        "🤗 CODE 20K – RÚT TỐI ĐA 200K\n\n"
+        "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 100 NGƯỜI\n"
+        f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
+        "📣 YÊU CẦU THAM GIA:\n"
+        "1️⃣ Tham gia kênh Telegram\n"
+        "2️⃣ Like fanpage Facebook\n"
+        "3️⃣ Follow TikTok\n\n"
+        "📸 Vui lòng gửi ảnh đã like fanpage + follow TikTok để xác nhận CODE\n\n"
+        "👇 Hoàn thành xong, bấm nút xác nhận để nhận KM"
+    )
+
+    keyboard = [
+        [
+            InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")
+        ],
+        [
+            InlineKeyboardButton(
+                "👍 LIKE FANPAGE",
+                url="https://www.facebook.com/profile.php?id=100076695622884"
+            ),
+            InlineKeyboardButton(
+                "🎵 FOLLOW TIKTOK",
+                url="https://www.tiktok.com/@winbook888?_r=1&_t=ZS-92LwUEoDMPs"
+            )
+        ],
+        [
+            InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
+            InlineKeyboardButton("👨‍💼 TELE CS002", url="https://t.me/WinbookCSKH002")
+        ],
+        [
+            InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
+        ]
     ]
-]
 
     await update.message.reply_text(
         text,
@@ -76,7 +77,6 @@ async def join_km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     bot = context.bot
 
-    # ❌ chưa join kênh
     if not await is_member(bot, user_id, CHANNEL_ID):
         await query.edit_message_text(
             "❌ Bạn CHƯA tham gia KÊNH Telegram.\n"
@@ -84,7 +84,6 @@ async def join_km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # ❌ chưa join nhóm
     if not await is_member(bot, user_id, GROUP_ID):
         await query.edit_message_text(
             "❌ Bạn CHƯA tham gia NHÓM CHAT.\n"
@@ -92,17 +91,14 @@ async def join_km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # chặn bấm lại
     if user_id in data["users"]:
         await query.edit_message_text("❗ Bạn đã nhận KM rồi.")
         return
 
-    # hết slot
     if data["count"] >= TOTAL_SLOTS:
         await query.edit_message_text("❌ Hết lượt hôm nay. Hẹn bạn ngày mai nha ❤️")
         return
 
-    # ✅ nhận KM
     data["count"] += 1
     data["users"].append(user_id)
     save_data(data)
@@ -126,7 +122,7 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("km", start))   # 👈 THÊM DÒNG NÀY
+    app.add_handler(CommandHandler("km", start))
     app.add_handler(CommandHandler("reset", reset))
     app.add_handler(CallbackQueryHandler(join_km))
 

@@ -28,19 +28,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
     text = (
-        "🤗 CODE 20K – RÚT TỐI ĐA 200K\n\n"
-        "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 100 NGƯỜI\n"
-        f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
-        "📣 YÊU CẦU THAM GIA:\n"
-        "1️⃣ Tham gia kênh Telegram\n"
-        "2️⃣ Follow TikTok\n\n"
-        "📸 Vui lòng gửi ảnh đã follow TikTok để xác nhận CODE\n\n"
-        "👇 Hoàn thành xong, bấm nút xác nhận để nhận KM"
-    )
-
+    "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN TIỀN THẬT 🔥🔥\n\n"
+    "📅 THỜI GIAN SỰ KIỆN: 01/01 – 05/01/2026\n\n"
+    "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 100 NGƯỜI\n"
+    f"👥 ĐÃ NHẬN: {data['count']}/{TOTAL_SLOTS}\n\n"
+    "📣 YÊU CẦU THAM GIA:\n"
+    "1️⃣ THAM GIA KÊNH WINBOOK\n"
+    "2️⃣ FOLLOW TIKTOK WINBOOK\n"
+    "3️⃣ LIKE FANPAGE + CHIA SẺ 03 HỘI NHÓM\n"
+    "   • CHIA SẺ TRANG CÁ NHÂN\n"
+    "   • TAG 03 BẠN BÈ (TÀI KHOẢN THẬT)\n"
+    "4️⃣ ĐĂNG KÝ 01 TÀI KHOẢN GAME (NẾU CHƯA CÓ)\n\n"
+    "📸 GỬI ẢNH FOLLOW TIKTOK & FANPAGE\n"
+    "👉 LIÊN HỆ CSKH ĐỂ XÁC NHẬN CODE\n\n"
+    "👇 HOÀN THÀNH NHIỆM VỤ, BẤM NÚT XÁC NHẬN ĐỂ NHẬN KHUYẾN MÃI"
+)
     keyboard = [
     [
-        InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent"),
+        InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")
+    ],
+    [
+        InlineKeyboardButton("👍 LIKE FANPAGE", url="https://www.facebook.com/profile.php?id=100076695622884"),
         InlineKeyboardButton(
             "🎵 FOLLOW TIKTOK",
             url="https://www.tiktok.com/@winbook888?_r=1&_t=ZS-92LwUEoDMPs"
@@ -54,6 +62,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
     ]
 ]
+
     await update.message.reply_text(
         text,
         reply_markup=InlineKeyboardMarkup(keyboard),

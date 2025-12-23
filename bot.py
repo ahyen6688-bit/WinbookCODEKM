@@ -37,7 +37,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     "2️⃣ FOLLOW TIKTOK WINBOOK\n"
     "3️⃣ LIKE FANPAGE + CHIA SẺ 03 HỘI NHÓM\n"
     "   • CHIA SẺ TRANG CÁ NHÂN\n"
-    "   • TAG 03 BẠN BÈ (TÀI KHOẢN THẬT)\n"
+    "   • TAG 03 BẠN BÈ (CÓ TRÊN 200 BẠN BÈ)\n"
     "4️⃣ ĐĂNG KÝ 01 TÀI KHOẢN GAME (NẾU CHƯA CÓ)\n\n"
     "📸 GỬI ẢNH FOLLOW TIKTOK & FANPAGE\n"
     "👉 LIÊN HỆ CSKH ĐỂ XÁC NHẬN CODE\n\n"

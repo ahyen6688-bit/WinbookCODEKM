@@ -33,35 +33,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}\n\n"
         "📣 YÊU CẦU THAM GIA:\n"
         "1️⃣ Tham gia kênh Telegram\n"
-        "2️⃣ Like fanpage Facebook\n"
-        "3️⃣ Follow TikTok\n\n"
-        "📸 Vui lòng gửi ảnh đã like fanpage + follow TikTok để xác nhận CODE\n\n"
+        "2️⃣ Follow TikTok\n\n"
+        "📸 Vui lòng gửi ảnh đã follow TikTok để xác nhận CODE\n\n"
         "👇 Hoàn thành xong, bấm nút xác nhận để nhận KM"
     )
 
     keyboard = [
-        [
-            InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")
-        ],
-        [
-            InlineKeyboardButton(
-                "👍 LIKE FANPAGE",
-                url="https://www.facebook.com/profile.php?id=100076695622884"
-            ),
-            InlineKeyboardButton(
-                "🎵 FOLLOW TIKTOK",
-                url="https://www.tiktok.com/@winbook888?_r=1&_t=ZS-92LwUEoDMPs"
-            )
-        ],
-        [
-            InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
-            InlineKeyboardButton("👨‍💼 TELE CS002", url="https://t.me/WinbookCSKH002")
-        ],
-        [
-            InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
-        ]
+    [
+        InlineKeyboardButton("📢 THAM GIA KÊNH", url="https://t.me/winbookEvent"),
+        InlineKeyboardButton(
+            "🎵 FOLLOW TIKTOK",
+            url="https://www.tiktok.com/@winbook888?_r=1&_t=ZS-92LwUEoDMPs"
+        )
+    ],
+    [
+        InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
+        InlineKeyboardButton("👨‍💼 TELE CS002", url="https://t.me/WinbookCSKH002")
+    ],
+    [
+        InlineKeyboardButton("✅ XÁC NHẬN KHUYẾN MÃI", callback_data="join")
     ]
-
+]
     await update.message.reply_text(
         text,
         reply_markup=InlineKeyboardMarkup(keyboard),

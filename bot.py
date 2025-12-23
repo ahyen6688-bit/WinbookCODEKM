@@ -43,10 +43,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     keyboard = [
-        [InlineKeyboardButton("📢 THAM GIA KÊNH", callback_data="step_tg")],
+        [InlineKeyboardButton("1️⃣📢 THAM GIA KÊNH", callback_data="step_tg")],
         [
-            InlineKeyboardButton("👍 LIKE FANPAGE", callback_data="step_fb"),
-            InlineKeyboardButton("🎵 FOLLOW TIKTOK", callback_data="step_tt")
+            InlineKeyboardButton("2️⃣👍 LIKE FANPAGE", callback_data="step_fb"),
+            InlineKeyboardButton("3️⃣🎵 FOLLOW TIKTOK", callback_data="step_tt")
         ],
         [
             InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
@@ -68,52 +68,40 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uid = query.from_user.id
     steps = get_steps(uid)
-
-    # ---- GHI NHẬN BẤM NÚT ----
+ 
+    # GHI NHẬN BẤM NÚT (IM LẶNG)
     if query.data == "step_tg":
         steps["tg"] = True
-        await query.message.reply_html(
-            f"✅ {query.from_user.mention_html()} đã bấm THAM GIA KÊNH"
-        )
         return
 
     if query.data == "step_fb":
         steps["fb"] = True
-        await query.message.reply_html(
-            f"✅ {query.from_user.mention_html()} đã bấm LIKE FANPAGE"
-        )
         return
 
     if query.data == "step_tt":
         steps["tt"] = True
-        await query.message.reply_html(
-            f"✅ {query.from_user.mention_html()} đã bấm FOLLOW TIKTOK"
-        )
         return
 
-    # ---- XÁC NHẬN ----
+    # ====== CHỈ XỬ LÝ KHI BẤM XÁC NHẬN ======
     if query.data == "confirm":
         if not all(steps.values()):
-            await query.message.reply_html(
-                f"⚠️ {query.from_user.mention_html()}\n"
-                f"Bạn CHƯA hoàn thành đủ nhiệm vụ.\n"
-                f"👉 Vui lòng hoàn thành đủ nhiệm vụ phía trên."
+            await query.message.reply_text(
+                "❗ Bạn CHƯA hoàn thành đủ nhiệm vụ.\n"
+                "👉 Vui lòng hoàn thành đủ nhiệm vụ phía trên."
             )
             return
 
         data = load_data()
 
         if uid in data["users"]:
-            await query.message.reply_html(
-                f"❗ {query.from_user.mention_html()}\n"
-                f"Bạn đã xác nhận trước đó rồi."
+            await query.message.reply_text(
+                "❗ Bạn đã xác nhận trước đó rồi."
             )
             return
 
         if data["count"] >= TOTAL_SLOTS:
-            await query.message.reply_html(
-                f"❌ {query.from_user.mention_html()}\n"
-                f"Hết lượt hôm nay. Hẹn bạn ngày mai ❤️"
+            await query.message.reply_text(
+                "❌ Hết lượt hôm nay. Hẹn bạn ngày mai nhé ❤️"
             )
             return
 
@@ -122,10 +110,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data["users"].append(uid)
         save_data(data)
 
-        await query.message.reply_html(
-            f"✅ {query.from_user.mention_html()}\n"
-            f"Bạn là người thứ <b>{data['count']}</b> hoàn thành nhiệm vụ.\n\n"
-            f"📸 Vui lòng gửi ảnh xác minh cho CSKH để được DUYỆT & NHẬN CODE."
+        await query.message.reply_text(
+            f"✅ Bạn là người thứ {data['count']} hoàn thành nhiệm vụ.\n\n"
+            "📸 Vui lòng gửi ảnh xác minh cho CSKH để được duyệt & nhận CODE."
         )
 
 # ================== RESET ==================

@@ -24,7 +24,29 @@ def get_steps(user_id):
 
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    uid = update.effective_user.id
     data = load_data()
+
+    # ĐÃ NHẬN RỒI
+    if uid in data["users"]:
+        await update.message.reply_text(
+            "⚠️ Bạn đã bấm nhận rồi.\n"
+            "👉 Mỗi Telegram chỉ được nhận 1 lần."
+        )
+        return
+
+    # HẾT SLOT → HẸN NGÀY MAI
+    if data["count"] >= TOTAL_SLOTS:
+        await update.message.reply_text(
+            "❌ KHUYẾN MÃI ĐÃ ĐỦ 100 NGƯỜI.\n"
+            "👉 Hẹn bạn quay lại ngày mai nhé ❤️"
+        )
+        return
+
+    # LẦN ĐẦU → TĂNG SỐ
+    data["count"] += 1
+    data["users"].append(uid)
+    save_data(data)
 
     text = (
         "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN 48K TIỀN THẬT 🔥🔥\n\n"
@@ -35,18 +57,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "1️⃣ THAM GIA KÊNH WINBOOK\n"
         "2️⃣ FOLLOW TIKTOK WINBOOK\n"
         "3️⃣ LIKE FANPAGE + CHIA SẺ 01 HỘI NHÓM\n"
-        "   • CHIA SẺ TRANG CÁ NHÂN\n"
-        "   • TAG 03 BẠN BÈ (CÓ TRÊN 200 BẠN BÈ)\n"
         "4️⃣ ĐĂNG KÝ 01 TÀI KHOẢN GAME (NẾU CHƯA CÓ)\n\n"
         "📸 SAU KHI HOÀN THÀNH → GỬI ẢNH CHO CSKH\n\n"
         "👇 BẤM ĐỦ CÁC NÚT, SAU ĐÓ XÁC NHẬN"
     )
 
     keyboard = [
-        [InlineKeyboardButton("1️⃣📢 THAM GIA KÊNH", callback_data="step_tg")],
+        [InlineKeyboardButton("1️⃣📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")],
         [
-            InlineKeyboardButton("2️⃣👍 LIKE FANPAGE", callback_data="step_fb"),
-            InlineKeyboardButton("3️⃣🎵 FOLLOW TIKTOK", callback_data="step_tt")
+            InlineKeyboardButton("2️⃣👍 LIKE FANPAGE", url="https://facebook.com/tenfanpage"),
+            InlineKeyboardButton("3️⃣🎵 FOLLOW TIKTOK", url="https://www.tiktok.com/@tentiktok")
         ],
         [
             InlineKeyboardButton("👩‍💼 TELE CS001", url="https://t.me/WinbookCSKH001"),
@@ -83,37 +103,19 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # ====== CHỈ XỬ LÝ KHI BẤM XÁC NHẬN ======
-    if query.data == "confirm":
-        if not all(steps.values()):
-            await query.message.reply_text(
-                "❗ Bạn CHƯA hoàn thành đủ nhiệm vụ.\n"
-                "👉 Vui lòng hoàn thành đủ nhiệm vụ phía trên."
-            )
-            return
-
-        data = load_data()
-
-        if uid in data["users"]:
-            await query.message.reply_text(
-                "❗ Bạn đã xác nhận trước đó rồi."
-            )
-            return
-
-        if data["count"] >= TOTAL_SLOTS:
-            await query.message.reply_text(
-                "❌ Hết lượt hôm nay. Hẹn bạn ngày mai nhé ❤️"
-            )
-            return
-
-        # 👉 CHỈ ĐẾM SỐ – KHÔNG PHÁT CODE
-        data["count"] += 1
-        data["users"].append(uid)
-        save_data(data)
-
+    # ====== CHỈ XỬ LÝ KHI BẤM XÁC NHẬN ======
+if query.data == "confirm":
+    if not all(steps.values()):
         await query.message.reply_text(
-            f"✅ Bạn là người thứ {data['count']} hoàn thành nhiệm vụ.\n\n"
-            "📸 Vui lòng gửi ảnh xác minh cho CSKH để được duyệt & nhận CODE."
+            "❗ Bạn CHƯA hoàn thành đủ nhiệm vụ.\n"
+            "👉 Vui lòng hoàn thành đủ nhiệm vụ phía trên."
         )
+        return
+
+    await query.message.reply_text(
+        "✅ Đã ghi nhận xác nhận của bạn.\n\n"
+        "📸 Vui lòng gửi ảnh xác minh cho CSKH để được duyệt & nhận CODE."
+    )
 
 # ================== RESET ==================
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):

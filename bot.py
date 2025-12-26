@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID
@@ -13,6 +14,15 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+# ================== DAILY RESET COUNT (GIỮ USERS) ==================
+def check_daily_reset(data):
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    if data.get("last_reset") != today:
+        data["count"] = 0
+        data["last_reset"] = today
+        save_data(data)
 
 # ================== CHECK JOIN CHANNEL ==================
 async def is_channel_member(context, user_id):
@@ -61,28 +71,34 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         disable_web_page_preview=True
     )
 
-# ================== /KM (ĐẾM SLOT – ADMIN KHÔNG TÍNH) ==================
+# ================== /KM (ĐẾM SLOT THEO NGÀY – ADMIN KHÔNG TÍNH) ==================
 async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
     data = load_data()
+
+    # 🔄 AUTO RESET COUNT KHI QUA NGÀY MỚI
+    check_daily_reset(data)
 
     # ADMIN TEST → KHÔNG TÍNH
     if uid == ADMIN_ID:
         await start(update, context)
         return
 
+    # NGƯỜI CŨ → KHÔNG NHẬN LẠI
     if uid in data["users"]:
         await update.message.reply_text(
             "⚠️ Bạn đã bấm nhận rồi.\n👉 Mỗi Telegram chỉ được nhận 1 lần."
         )
         return
 
+    # HẾT SLOT TRONG NGÀY
     if data["count"] >= TOTAL_SLOTS:
         await update.message.reply_text(
-            "❌ Khuyến mãi đã đủ 100 người.\n👉 Hẹn bạn quay lại ngày mai nhé ❤️"
+            "❌ Khuyến mãi hôm nay đã đủ 100 người.\n👉 Hẹn bạn quay lại ngày mai nhé ❤️"
         )
         return
 
+    # NGƯỜI MỚI TRONG NGÀY
     data["count"] += 1
     data["users"].append(uid)
     save_data(data)
@@ -97,14 +113,12 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "confirm":
         user = query.from_user
 
-        # TAG TELE GỌN
         mention = (
             f"@{user.username}"
             if user.username
             else f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
         )
 
-        # 🔴 CHECK JOIN KÊNH TELEGRAM
         if not await is_channel_member(context, user.id):
             await query.message.reply_text(
                 f"❗ {mention} chưa tham gia kênh Winbook.\n"
@@ -113,19 +127,21 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-        # 🟢 OK → TAG + NHẮC
         await query.message.reply_text(
             f"✅ {mention} đã hoàn thành nhiệm vụ.\n\n"
             "📸 Vui lòng gửi hình ảnh xác minh (like Facebook + follow TikTok) cho CSKH để được duyệt & nhận CODE.",
             parse_mode="HTML"
         )
 
-# ================== RESET ==================
+# ================== RESET (THỦ CÔNG – GIỮ USERS) ==================
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
-    save_data({"count": 0, "users": []})
-    await update.message.reply_text("🔄 Đã reset lượt hôm nay.")
+    data = load_data()
+    data["count"] = 0
+    data["last_reset"] = datetime.now().strftime("%Y-%m-%d")
+    save_data(data)
+    await update.message.reply_text("🔄 Đã reset lượt hôm nay (không xóa người cũ).")
 
 # ================== MAIN ==================
 def main():

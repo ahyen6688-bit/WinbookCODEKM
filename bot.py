@@ -22,31 +22,9 @@ def get_steps(user_id):
         user_steps[user_id] = {"tg": False, "fb": False, "tt": False}
     return user_steps[user_id]
 
-# ================== START (/km) ==================
+# ================== /START (CHỈ HIỂN THỊ) ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    uid = update.effective_user.id
     data = load_data()
-
-    # ĐÃ NHẬN RỒI
-    if uid in data["users"]:
-        await update.message.reply_text(
-            "⚠️ Bạn đã bấm nhận rồi.\n"
-            "👉 Mỗi Telegram chỉ được nhận 1 lần."
-        )
-        return
-
-    # HẾT SLOT
-    if data["count"] >= TOTAL_SLOTS:
-        await update.message.reply_text(
-            "❌ Khuyến mãi đã đủ 100 người.\n"
-            "👉 Hẹn bạn quay lại ngày mai nhé ❤️"
-        )
-        return
-
-    # LẦN ĐẦU → TĂNG SỐ NGAY
-    data["count"] += 1
-    data["users"].append(uid)
-    save_data(data)
 
     text = (
         "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN 48K TIỀN THẬT 🔥🔥\n\n"
@@ -83,6 +61,37 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         disable_web_page_preview=True
     )
 
+# ================== /KM (ĐẾM SLOT – ADMIN KHÔNG TÍNH) ==================
+async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    uid = update.effective_user.id
+    data = load_data()
+
+    # ADMIN TEST → KHÔNG TÍNH
+    if uid == ADMIN_ID:
+        await start(update, context)
+        return
+
+    # ĐÃ NHẬN RỒI
+    if uid in data["users"]:
+        await update.message.reply_text(
+            "⚠️ Bạn đã bấm nhận rồi.\n👉 Mỗi Telegram chỉ được nhận 1 lần."
+        )
+        return
+
+    # HẾT SLOT
+    if data["count"] >= TOTAL_SLOTS:
+        await update.message.reply_text(
+            "❌ Khuyến mãi đã đủ 100 người.\n👉 Hẹn bạn quay lại ngày mai nhé ❤️"
+        )
+        return
+
+    # TĂNG SLOT
+    data["count"] += 1
+    data["users"].append(uid)
+    save_data(data)
+
+    await start(update, context)
+
 # ================== CALLBACK ==================
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -91,18 +100,40 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = query.from_user.id
     steps = get_steps(uid)
 
-    # CHỈ GHI NHẬN (KHÔNG MỞ LINK, KHÔNG ĐẾM)
+    # ghi nhận bấm nút (im lặng)
+    if query.data == "step_tg":
+        steps["tg"] = True
+        return
+    if query.data == "step_fb":
+        steps["fb"] = True
+        return
+    if query.data == "step_tt":
+        steps["tt"] = True
+        return
+
+    # ====== XÁC NHẬN ======
     if query.data == "confirm":
+        user = query.from_user
+
+        # TAG TELE GỌN
+        if user.username:
+            mention = f"@{user.username}"
+        else:
+            mention = f"<a href='tg://user?id={user.id}'>{user.full_name}</a>"
+
         if not all(steps.values()):
             await query.message.reply_text(
-                "❗ Bạn CHƯA hoàn thành đủ nhiệm vụ.\n"
-                "👉 Vui lòng hoàn thành đủ nhiệm vụ phía trên."
+                f"❗ {mention} chưa hoàn thành đủ nhiệm vụ.\n"
+                "👉 Vui lòng hoàn thành đủ nhiệm vụ phía trên.",
+                parse_mode="HTML"
             )
             return
 
+        # DÙ BẤM BAO NHIÊU LẦN → VẪN TAG + NHẮC
         await query.message.reply_text(
-            "✅ Đã ghi nhận xác nhận của bạn.\n\n"
-            "📸 Vui lòng gửi ảnh xác minh cho CSKH để được duyệt & nhận CODE."
+            f"✅ {mention} đã hoàn thành nhiệm vụ.\n\n"
+            "📸 Vui lòng gửi hình ảnh xác minh cho CSKH để được duyệt & nhận CODE.",
+            parse_mode="HTML"
         )
 
 # ================== RESET ==================
@@ -117,7 +148,7 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("km", start))
+    app.add_handler(CommandHandler("km", km))
     app.add_handler(CommandHandler("reset", reset))
     app.add_handler(CallbackQueryHandler(handle_callback))
 

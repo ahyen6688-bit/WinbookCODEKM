@@ -1,10 +1,24 @@
 import json
 from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes
+)
 from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID
 
 DATA_FILE = "data.json"
+
+# ================== CLICK TRACKING ==================
+user_steps = {}
+# { user_id: {"fb": False, "tt": False} }
+
+def get_steps(uid):
+    if uid not in user_steps:
+        user_steps[uid] = {"fb": False, "tt": False}
+    return user_steps[uid]
 
 # ================== DATA ==================
 def load_data():
@@ -43,22 +57,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"👥 ĐÃ NHẬN: {data['count']}/{TOTAL_SLOTS}\n\n"
         "📌 NHIỆM VỤ BẮT BUỘC:\n"
         "1️⃣ Tham gia kênh Telegram\n"
-        "2️⃣ Like Fanpage Facebook\n"
-        "3️⃣ Follow TikTok\n\n"
-        "📸 Hoàn thành xong, bấm xác nhận và gửi ảnh cho CSKH"
+        "2️⃣ Bấm nút Facebook\n"
+        "3️⃣ Bấm nút TikTok\n\n"
+        "👇 Hoàn thành đủ rồi bấm xác nhận"
     )
 
     keyboard = [
         [InlineKeyboardButton("1️⃣📢 THAM GIA KÊNH", url="https://t.me/winbookEvent")],
         [
-            InlineKeyboardButton("2️⃣👍 LIKE FACEBOOK", url="https://facebook.com/tenfanpage"),
-            InlineKeyboardButton("3️⃣🎵 FOLLOW TIKTOK", url="https://tiktok.com/@tentiktok")
+            InlineKeyboardButton("2️⃣👍 FACEBOOK", callback_data="fb"),
+            InlineKeyboardButton("3️⃣🎵 TIKTOK", callback_data="tt")
         ],
+        [InlineKeyboardButton("✅ XÁC NHẬN NHIỆM VỤ", callback_data="confirm")],
         [
             InlineKeyboardButton("👩‍💼 CSKH 001", url="https://t.me/WinbookCSKH001"),
             InlineKeyboardButton("👨‍💼 CSKH 002", url="https://t.me/WinbookCSKH002")
-        ],
-        [InlineKeyboardButton("✅ XÁC NHẬN NHIỆM VỤ", callback_data="confirm")]
+        ]
     ]
 
     await update.message.reply_text(
@@ -99,26 +113,56 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await start(update, context)
 
-# ================== CALLBACK CONFIRM ==================
+# ================== CALLBACK ==================
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    user = query.from_user
+    uid = query.from_user.id
+    steps = get_steps(uid)
 
-    if not await is_channel_member(context, user.id):
+    # FACEBOOK
+    if query.data == "fb":
+        steps["fb"] = True
         await query.message.reply_text(
-            "❗ Bạn CHƯA tham gia kênh Telegram.\n👉 Vui lòng tham gia kênh trước khi xác nhận."
+            "👍 Đã ghi nhận bạn bấm Facebook.\n👉 Truy cập: https://facebook.com/tenfanpage"
         )
         return
 
-    await query.message.reply_text(
-        "✅ Bạn đã bấm xác nhận nhiệm vụ.\n\n"
-        "📌 Vui lòng đảm bảo:\n"
-        "• Đã tham gia Telegram\n"
-        "• Đã like Facebook\n"
-        "• Đã follow TikTok\n\n"
-        "📸 Gửi hình ảnh xác minh cho CSKH để được duyệt & nhận CODE."
-    )
+    # TIKTOK
+    if query.data == "tt":
+        steps["tt"] = True
+        await query.message.reply_text(
+            "🎵 Đã ghi nhận bạn bấm TikTok.\n👉 Truy cập: https://tiktok.com/@tentiktok"
+        )
+        return
+
+    # XÁC NHẬN
+    if query.data == "confirm":
+        # check tham gia channel
+        if not await is_channel_member(context, uid):
+            await query.message.reply_text(
+                "❗ Bạn CHƯA tham gia kênh Telegram.\n👉 Vui lòng tham gia kênh trước."
+            )
+            return
+
+        missing = []
+        if not steps["fb"]:
+            missing.append("Facebook")
+        if not steps["tt"]:
+            missing.append("TikTok")
+
+        if missing:
+            await query.message.reply_text(
+                "❗ Bạn CHƯA hoàn thành:\n"
+                + " • " + "\n • ".join(missing)
+                + "\n👉 Vui lòng bấm đủ các nút trước khi xác nhận."
+            )
+            return
+
+        await query.message.reply_text(
+            "✅ Bạn đã hoàn thành nhiệm vụ.\n\n"
+            "📸 Vui lòng gửi hình ảnh xác minh (Facebook + TikTok) cho CSKH để được duyệt & nhận CODE."
+        )
 
 # ================== RESET (ADMIN) ==================
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):

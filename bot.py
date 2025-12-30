@@ -36,6 +36,9 @@ async def is_channel_member(context, user_id):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
+    # 🔄 RESET COUNT KHI QUA NGÀY MỚI (KHÔNG TÍNH ADMIN)
+    check_daily_reset(data)
+
     text = (
         "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN 48K TIỀN THẬT 🔥🔥\n\n"
         "📅 THỜI GIAN SỰ KIỆN: 01/01 – 05/01/2026\n\n"

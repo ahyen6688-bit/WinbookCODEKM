@@ -88,29 +88,38 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================== /KM ==================
 async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
+    chat_type = update.message.chat.type  # private / group / supergroup
+
     data = load_data()
     check_daily_reset(data)
 
-    # ADMIN TEST → KHÔNG TÍNH
+    # 🚫 ADMIN Ở ĐÂU CŨNG KHÔNG TÍNH
     if uid == ADMIN_ID:
         await start(update, context)
         return
 
-    # NGƯỜI ĐÃ NHẬN → KHÔNG NHẬN LẠI
+    # ❌ CHAT RIÊNG → CHỈ ĐỂ XEM, KHÔNG TÍNH
+    if chat_type == "private":
+        await start(update, context)
+        return
+
+    # 👉 TỚI ĐÂY = USER THƯỜNG TRONG NHÓM → MỚI TÍNH
+
+    # ❌ ĐÃ NHẬN RỒI
     if uid in data["users"]:
         await update.message.reply_text(
             "⚠️ Bạn đã tham gia sự kiện trước đó.\n👉 Mỗi tài khoản chỉ được nhận 1 lần."
         )
         return
 
-    # HẾT SLOT TRONG NGÀY
+    # ❌ HẾT SLOT
     if data["count"] >= TOTAL_SLOTS:
         await update.message.reply_text(
             "❌ Hôm nay đã đủ 100 người.\n👉 Vui lòng quay lại vào ngày mai."
         )
         return
 
-    # NGƯỜI MỚI
+    # ✅ USER HỢP LỆ TRONG NHÓM
     data["count"] += 1
     data["users"].append(uid)
     save_data(data)
@@ -128,7 +137,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "fb":
         steps["fb"] = True
         await query.message.reply_text(
-            "👍 Đã ghi nhận bạn bấm Facebook.\n👉 Truy cập: https://facebook.com/tenfanpage"
+            "👍 VUI LÒNG HOÀN THÀNH NHIỆM VỤ Facebook.\n👉 Truy cập: https://facebook.com/tenfanpage"
         )
         return
 
@@ -136,7 +145,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "tt":
         steps["tt"] = True
         await query.message.reply_text(
-            "🎵 Đã ghi nhận bạn bấm TikTok.\n👉 Truy cập: https://tiktok.com/@tentiktok"
+            "🎵 VUI LÒNG HOÀN THÀNH NHIỆM VỤ TikTok.\n👉 Truy cập: https://www.tiktok.com/@winbook888?_r=1&_t=ZS-91Md0CumhMK"
         )
         return
 

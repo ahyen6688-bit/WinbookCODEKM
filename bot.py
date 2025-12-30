@@ -51,15 +51,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     check_daily_reset(data)
 
     text = (
-        "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN CODE 48K 🔥🔥\n\n"
-        "📅 THỜI GIAN: 01/01 – 05/01/2026\n\n"
-        "🎁 MỖI NGÀY 100 NGƯỜI\n"
+        "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN 48K TIỀN THẬT 🔥🔥\n\n"
+        "📅 THỜI GIAN SỰ KIỆN: 01/01 – 05/01/2026\n\n"
+        "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 100 NGƯỜI\n"
         f"👥 ĐÃ NHẬN: {data['count']}/{TOTAL_SLOTS}\n\n"
-        "📌 NHIỆM VỤ BẮT BUỘC:\n"
-        "1️⃣ Tham gia kênh Telegram\n"
-        "2️⃣ Bấm nút Facebook\n"
-        "3️⃣ Bấm nút TikTok\n\n"
-        "👇 Hoàn thành đủ rồi bấm xác nhận"
+        "📣 YÊU CẦU THAM GIA:\n"
+        "1️⃣ THAM GIA KÊNH WINBOOK\n"
+        "2️⃣ FOLLOW TIKTOK WINBOOK\n"
+        "3️⃣ LIKE FANPAGE + CHIA SẺ 01 HỘI NHÓM\n"
+        "   • CHIA SẺ TRANG CÁ NHÂN\n"
+        "   • TAG 03 BẠN BÈ (CÓ TRÊN 200 BẠN BÈ)\n"
+        "4️⃣ ĐĂNG KÝ 01 TÀI KHOẢN GAME (NẾU CHƯA CÓ)\n\n"
+        "📸 SAU KHI HOÀN THÀNH → GỬI ẢNH CHO CSKH\n\n"
+        "👇 BẤM ĐỦ CÁC NÚT, SAU ĐÓ XÁC NHẬN"
     )
 
     keyboard = [

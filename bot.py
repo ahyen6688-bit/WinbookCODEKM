@@ -137,7 +137,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "fb":
         steps["fb"] = True
         await query.message.reply_text(
-            "👍 VUI LÒNG HOÀN THÀNH NHIỆM VỤ Facebook.\n👉 Truy cập: https://facebook.com/tenfanpage"
+            "👍 VUI LÒNG HOÀN THÀNH NHIỆM VỤ Facebook.\n👉 Truy cập: https://www.facebook.com/profile.php?id=100076695622884"
         )
         return
 

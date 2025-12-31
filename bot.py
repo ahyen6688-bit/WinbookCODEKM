@@ -58,7 +58,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "📣 YÊU CẦU THAM GIA:\n"
         "1️⃣ THAM GIA KÊNH WINBOOK\n"
         "2️⃣ FOLLOW TIKTOK WINBOOK\n"
-        "3️⃣ LIKE FANPAGE + CHIA SẺ 01 HỘI NHÓM\n"
+        "3️⃣ LIKE FANPAGE + CHIA SẺ 01 HỘI NHÓM GAME BÀI TRÊN 5000 THÀNH VIÊN\n"
         "   • CHIA SẺ TRANG CÁ NHÂN\n"
         "   • TAG 03 BẠN BÈ (CÓ TRÊN 200 BẠN BÈ)\n"
         "4️⃣ ĐĂNG KÝ 01 TÀI KHOẢN GAME (NẾU CHƯA CÓ)\n\n"

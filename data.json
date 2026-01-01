@@ -1,5 +1,6 @@
 {
   "count": 0,
-  "users": [],
+  "users_today": [],
+  "users_all": [],
   "last_reset": "2026-01-01"
 }

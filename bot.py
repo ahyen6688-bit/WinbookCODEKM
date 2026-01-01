@@ -114,7 +114,7 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     auto_daily_reset(data)
 
-    if uid in ADMIN_IDS: or chat_type == "private":
+    if uid in ADMIN_IDS or chat_type == "private":
         await start(update, context)
         return
 

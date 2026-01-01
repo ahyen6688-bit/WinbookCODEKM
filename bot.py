@@ -150,17 +150,30 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "fb":
         steps["fb"] = True
-        await query.message.reply_text("👍 Vui lòng hoàn thành nhiệm vụ Facebook.")
+        await query.message.reply_text(
+            "👍 Vui lòng hoàn thành nhiệm vụ Facebook:\n"
+            "👉 https://www.facebook.com/profile.php?id=100076695622884\n\n"
+            "✅ Sau khi xong, quay lại bấm *Xác nhận*",
+            parse_mode="Markdown"
+        )
         return
 
     if query.data == "tt":
         steps["tt"] = True
-        await query.message.reply_text("🎵 Vui lòng hoàn thành nhiệm vụ TikTok.")
+        await query.message.reply_text(
+            "🎵 Vui lòng hoàn thành nhiệm vụ TikTok:\n"
+            "👉 https://www.tiktok.com/@winbook888?_r=1&_t=ZS-91Md0CumhMK\n\n"
+            "✅ Sau khi xong, quay lại bấm *Xác nhận*",
+            parse_mode="Markdown"
+        )
         return
 
     if query.data == "confirm":
         if not await is_channel_member(context, uid):
-            await query.message.reply_text("❗ Bạn CHƯA tham gia kênh Telegram.")
+            await query.message.reply_text(
+                "❗ Bạn **CHƯA tham gia** kênh Telegram.",
+                parse_mode="Markdown"
+            )
             return
 
         missing = []
@@ -171,12 +184,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if missing:
             await query.message.reply_text(
-                "❗ Bạn CHƯA hoàn thành:\n• " + "\n• ".join(missing)
+                "❗ Bạn **CHƯA hoàn thành**:\n• " + "\n• ".join(missing),
+                parse_mode="Markdown"
             )
             return
 
         await query.message.reply_text(
-            "✅ Bạn đã hoàn thành nhiệm vụ.\n📸 Gửi ảnh xác minh cho CSKH."
+            "✅ Bạn đã **hoàn thành nhiệm vụ**.\n"
+            "📸 Vui lòng **gửi ảnh xác minh** cho CSKH."
         )
 
 # ================== MAIN ==================

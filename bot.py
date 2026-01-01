@@ -118,24 +118,27 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await start(update, context)
         return
 
-    if uid in data.get("users", []):
+    # chặn vĩnh viễn
+if uid in data.get("users_all", []):
     await update.message.reply_text(
         "❌ Bạn đã nhận khuyến mãi trước đó rồi.\n"
         "👉 Mỗi tài khoản chỉ được nhận 1 lần duy nhất."
     )
     return
 
-    if data["count"] >= TOTAL_SLOTS:
-        await update.message.reply_text(
-            "❌ Hôm nay đã đủ 100 người.\n👉 Vui lòng quay lại vào ngày mai."
-        )
-        return
+# đủ slot trong ngày
+if data["count"] >= TOTAL_SLOTS:
+    await update.message.reply_text(
+        "❌ Hôm nay đã đủ 100 người.\n👉 Vui lòng quay lại ngày mai."
+    )
+    return
 
-    # TÍNH SLOT
-    data["count"] += 1
-    data["users_today"].append(uid)   # để đếm 100/ngày
-    data["users"].append(uid)         # chặn vĩnh viễn
-    save_data(data)
+# tính slot
+data["count"] += 1
+data["users_today"].append(uid)
+data["users_all"].append(uid)
+save_data(data)
+
 
 
     slot_number = data["count"]

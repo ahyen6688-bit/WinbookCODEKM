@@ -1,6 +1,5 @@
 import json
-from datetime import datetime
-import pytz
+from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -33,7 +32,7 @@ def save_data(data):
 
 # ================== DAILY RESET (GIỜ VIỆT NAM) ==================
 def check_daily_reset(data):
-    today = datetime.now(VN_TZ).strftime("%Y-%m-%d")
+    today = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
     if data.get("last_reset") != today:
         data["count"] = 0
         data["users"] = []
@@ -181,7 +180,7 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     data["count"] = 0
     data["users"] = []
-    data["last_reset"] = datetime.now(VN_TZ).strftime("%Y-%m-%d")
+    data["last_reset"] = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
     save_data(data)
     await update.message.reply_text("🔄 Đã reset lượt hôm nay.")
 

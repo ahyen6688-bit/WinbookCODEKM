@@ -7,7 +7,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes
 )
-from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID
+from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_IDS, CHANNEL_ID
 
 DATA_FILE = "data.json"
 
@@ -66,7 +66,7 @@ async def notify_admin_km(context, user, slot_number, joined):
         f"⏰ Thời gian: {time_vn}"
     )
 
-    await context.bot.send_message(ADMIN_ID, text)
+    await context.bot.send_message(ADMIN_IDS, text)
 
 # ================== /START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):

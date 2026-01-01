@@ -38,7 +38,7 @@ def auto_daily_reset(data):
     if data.get("last_reset") == today:
         return
     data["count"] = 0
-    data["users"] = []
+    data["users_today"] = []
     data["last_reset"] = today
     save_data(data)
 
@@ -118,11 +118,12 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await start(update, context)
         return
 
-    if uid in data["users"]:
-        await update.message.reply_text(
-            f"⚠️ Bạn đã tham gia hôm nay rồi.\n👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}"
-        )
-        return
+    if uid in data.get("users", []):
+    await update.message.reply_text(
+        "❌ Bạn đã nhận khuyến mãi trước đó rồi.\n"
+        "👉 Mỗi tài khoản chỉ được nhận 1 lần duy nhất."
+    )
+    return
 
     if data["count"] >= TOTAL_SLOTS:
         await update.message.reply_text(
@@ -132,8 +133,10 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # TÍNH SLOT
     data["count"] += 1
-    data["users"].append(uid)
+    data["users_today"].append(uid)   # để đếm 100/ngày
+    data["users"].append(uid)         # chặn vĩnh viễn
     save_data(data)
+
 
     slot_number = data["count"]
     joined = await is_channel_member(context, uid)

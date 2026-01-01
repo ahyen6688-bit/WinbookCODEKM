@@ -10,7 +10,6 @@ from telegram.ext import (
 from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID
 
 DATA_FILE = "data.json"
-VN_TZ = pytz.timezone("Asia/Ho_Chi_Minh")
 
 # ================== CLICK TRACKING ==================
 user_steps = {}

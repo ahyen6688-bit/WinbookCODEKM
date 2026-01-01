@@ -13,7 +13,6 @@ DATA_FILE = "data.json"
 
 # ================== CLICK TRACKING ==================
 user_steps = {}
-# { user_id: {"fb": False, "tt": False} }
 
 def get_steps(uid):
     if uid not in user_steps:
@@ -29,14 +28,19 @@ def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# ================== DAILY RESET (GIỜ VIỆT NAM) ==================
-def check_daily_reset(data):
-    today = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
-    if data.get("last_reset") != today:
-        data["count"] = 0
-        data["users"] = []
-        data["last_reset"] = today
-        save_data(data)
+# ================== TIME (VN) ==================
+def vn_today():
+    return (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
+
+# ================== AUTO DAILY RESET ==================
+def auto_daily_reset(data):
+    today = vn_today()
+    if data.get("last_reset") == today:
+        return
+    data["count"] = 0
+    data["users"] = []
+    data["last_reset"] = today
+    save_data(data)
 
 # ================== CHECK JOIN CHANNEL ==================
 async def is_channel_member(context, user_id):
@@ -46,10 +50,27 @@ async def is_channel_member(context, user_id):
     except:
         return False
 
+# ================== NOTIFY ADMIN ==================
+async def notify_admin_km(context, user, slot_number, joined):
+    status = "✅ ĐÃ THAM GIA CHANNEL" if joined else "❌ CHƯA THAM GIA CHANNEL"
+    username = f"@{user.username}" if user.username else "(không có username)"
+    time_vn = (datetime.utcnow() + timedelta(hours=7)).strftime("%H:%M:%S %d-%m-%Y")
+
+    text = (
+        "📢 USER BẤM /KM\n\n"
+        f"👤 Tên: {user.full_name}\n"
+        f"🔗 Username: {username}\n"
+        f"🆔 ID: {user.id}\n"
+        f"🎯 Thứ tự: {slot_number}/{TOTAL_SLOTS}\n"
+        f"{status}\n"
+        f"⏰ Thời gian: {time_vn}"
+    )
+
+    await context.bot.send_message(ADMIN_ID, text)
+
 # ================== /START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
-    check_daily_reset(data)
 
     text = (
         "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN 48K TIỀN THẬT 🔥🔥\n\n"
@@ -84,43 +105,40 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         disable_web_page_preview=True
     )
 
-# ================== /KM (BẤM LÀ TÍNH SLOT) ==================
+# ================== /KM ==================
 async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
+    user = update.effective_user
     chat_type = update.message.chat.type
 
     data = load_data()
-    check_daily_reset(data)
+    auto_daily_reset(data)
 
-    # 🚫 ADMIN KHÔNG TÍNH
-    if uid == ADMIN_ID:
+    if uid == ADMIN_ID or chat_type == "private":
         await start(update, context)
         return
 
-    # ❌ CHAT RIÊNG → KHÔNG TÍNH
-    if chat_type == "private":
-        await start(update, context)
-        return
-
-    # ❌ ĐÃ GÕ /km HÔM NAY
     if uid in data["users"]:
         await update.message.reply_text(
             f"⚠️ Bạn đã tham gia hôm nay rồi.\n👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}"
         )
         return
 
-    # ❌ HẾT SLOT
     if data["count"] >= TOTAL_SLOTS:
         await update.message.reply_text(
             "❌ Hôm nay đã đủ 100 người.\n👉 Vui lòng quay lại vào ngày mai."
         )
         return
 
-    # ✅ GÕ /km → TÍNH SLOT NGAY
+    # TÍNH SLOT
     data["count"] += 1
     data["users"].append(uid)
     save_data(data)
 
+    slot_number = data["count"]
+    joined = await is_channel_member(context, uid)
+
+    await notify_admin_km(context, user, slot_number, joined)
     await start(update, context)
 
 # ================== CALLBACK ==================
@@ -132,23 +150,17 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "fb":
         steps["fb"] = True
-        await query.message.reply_text(
-            "👍 VUI LÒNG HOÀN THÀNH NHIỆM VỤ Facebook.\n👉 Truy cập: https://www.facebook.com/profile.php?id=100076695622884"
-        )
+        await query.message.reply_text("👍 Vui lòng hoàn thành nhiệm vụ Facebook.")
         return
 
     if query.data == "tt":
         steps["tt"] = True
-        await query.message.reply_text(
-            "🎵 VUI LÒNG HOÀN THÀNH NHIỆM VỤ TikTok.\n👉 Truy cập: https://www.tiktok.com/@winbook888?_r=1&_t=ZS-91Md0CumhMK"
-        )
+        await query.message.reply_text("🎵 Vui lòng hoàn thành nhiệm vụ TikTok.")
         return
 
     if query.data == "confirm":
         if not await is_channel_member(context, uid):
-            await query.message.reply_text(
-                "❗ Bạn CHƯA tham gia kênh Telegram.\n👉 Vui lòng tham gia kênh trước."
-            )
+            await query.message.reply_text("❗ Bạn CHƯA tham gia kênh Telegram.")
             return
 
         missing = []
@@ -159,37 +171,23 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if missing:
             await query.message.reply_text(
-                "❗ Bạn CHƯA hoàn thành:\n"
-                + " • " + "\n • ".join(missing)
-                + "\n👉 Vui lòng bấm đủ các nút trước khi xác nhận."
+                "❗ Bạn CHƯA hoàn thành:\n• " + "\n• ".join(missing)
             )
             return
 
         await query.message.reply_text(
-            "✅ Bạn đã hoàn thành nhiệm vụ.\n\n"
-            "📸 Vui lòng gửi hình ảnh xác minh (Facebook + TikTok) cho CSKH để được duyệt & nhận CODE."
+            "✅ Bạn đã hoàn thành nhiệm vụ.\n📸 Gửi ảnh xác minh cho CSKH."
         )
-
-# ================== RESET (ADMIN – GIỜ VN) ==================
-async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
-        return
-    data = load_data()
-    data["count"] = 0
-    data["users"] = []
-    data["last_reset"] = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
-    save_data(data)
-    await update.message.reply_text("🔄 Đã reset lượt hôm nay.")
 
 # ================== MAIN ==================
 def main():
-    app = Application.builder().token(BOT_TOKEN).build()
+    data = load_data()
+    auto_daily_reset(data)
 
+    app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("km", km))
-    app.add_handler(CommandHandler("reset", reset))
     app.add_handler(CallbackQueryHandler(handle_callback))
-
     app.run_polling()
 
 if __name__ == "__main__":

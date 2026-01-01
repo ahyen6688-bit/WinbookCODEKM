@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import pytz
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -10,6 +11,7 @@ from telegram.ext import (
 from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID
 
 DATA_FILE = "data.json"
+VN_TZ = pytz.timezone("Asia/Ho_Chi_Minh")
 
 # ================== CLICK TRACKING ==================
 user_steps = {}
@@ -29,11 +31,12 @@ def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# ================== DAILY RESET (CHỈ RESET COUNT) ==================
+# ================== DAILY RESET (GIỜ VIỆT NAM) ==================
 def check_daily_reset(data):
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = datetime.now(VN_TZ).strftime("%Y-%m-%d")
     if data.get("last_reset") != today:
         data["count"] = 0
+        data["users"] = []
         data["last_reset"] = today
         save_data(data)
 
@@ -85,30 +88,28 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         disable_web_page_preview=True
     )
 
-# ================== /KM ==================
+# ================== /KM (BẤM LÀ TÍNH SLOT) ==================
 async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
-    chat_type = update.message.chat.type  # private / group / supergroup
+    chat_type = update.message.chat.type
 
     data = load_data()
     check_daily_reset(data)
 
-    # 🚫 ADMIN Ở ĐÂU CŨNG KHÔNG TÍNH
+    # 🚫 ADMIN KHÔNG TÍNH
     if uid == ADMIN_ID:
         await start(update, context)
         return
 
-    # ❌ CHAT RIÊNG → CHỈ ĐỂ XEM, KHÔNG TÍNH
+    # ❌ CHAT RIÊNG → KHÔNG TÍNH
     if chat_type == "private":
         await start(update, context)
         return
 
-    # 👉 TỚI ĐÂY = USER THƯỜNG TRONG NHÓM → MỚI TÍNH
-
-    # ❌ ĐÃ NHẬN RỒI
+    # ❌ ĐÃ GÕ /km HÔM NAY
     if uid in data["users"]:
         await update.message.reply_text(
-            "⚠️ Bạn đã tham gia sự kiện trước đó.\n👉 Mỗi tài khoản chỉ được nhận 1 lần."
+            f"⚠️ Bạn đã tham gia hôm nay rồi.\n👥 Đã nhận: {data['count']}/{TOTAL_SLOTS}"
         )
         return
 
@@ -119,7 +120,7 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # ✅ USER HỢP LỆ TRONG NHÓM
+    # ✅ GÕ /km → TÍNH SLOT NGAY
     data["count"] += 1
     data["users"].append(uid)
     save_data(data)
@@ -133,7 +134,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = query.from_user.id
     steps = get_steps(uid)
 
-    # FACEBOOK
     if query.data == "fb":
         steps["fb"] = True
         await query.message.reply_text(
@@ -141,7 +141,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # TIKTOK
     if query.data == "tt":
         steps["tt"] = True
         await query.message.reply_text(
@@ -149,9 +148,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # XÁC NHẬN
     if query.data == "confirm":
-        # check tham gia channel
         if not await is_channel_member(context, uid):
             await query.message.reply_text(
                 "❗ Bạn CHƯA tham gia kênh Telegram.\n👉 Vui lòng tham gia kênh trước."
@@ -177,13 +174,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "📸 Vui lòng gửi hình ảnh xác minh (Facebook + TikTok) cho CSKH để được duyệt & nhận CODE."
         )
 
-# ================== RESET (ADMIN) ==================
+# ================== RESET (ADMIN – GIỜ VN) ==================
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
     data = load_data()
     data["count"] = 0
-    data["last_reset"] = datetime.now().strftime("%Y-%m-%d")
+    data["users"] = []
+    data["last_reset"] = datetime.now(VN_TZ).strftime("%Y-%m-%d")
     save_data(data)
     await update.message.reply_text("🔄 Đã reset lượt hôm nay.")
 

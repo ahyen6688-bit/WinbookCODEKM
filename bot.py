@@ -66,7 +66,8 @@ async def notify_admin_km(context, user, slot_number, joined):
         f"⏰ Thời gian: {time_vn}"
     )
 
-    await context.bot.send_message(ADMIN_ID, text)
+    for admin_id in ADMIN_IDS:
+        await context.bot.send_message(admin_id, text)
 
 # ================== /START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -117,9 +118,15 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     auto_daily_reset(data)
 
-    if uid in ADMIN_IDS or chat_type == "private":
-        await start(update, context)
-        return
+    # 🚫 ADMIN KHÔNG TÍNH SLOT
+if uid in ADMIN_IDS:
+    await start(update, context)
+    return
+
+# 🚫 KHÔNG CHO DÙNG TRONG PRIVATE
+if update.message.chat.type == "private":
+    await update.message.reply_text("❌ Vui lòng dùng lệnh này trong nhóm.")
+    return
 
     if uid in data["users"]:
         await update.message.reply_text(

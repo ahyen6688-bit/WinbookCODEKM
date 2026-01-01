@@ -107,6 +107,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== /KM ==================
 async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message:
+        return
+
     uid = update.effective_user.id
     user = update.effective_user
     chat_type = update.message.chat.type
@@ -186,7 +189,7 @@ def main():
 
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("km", km))
+    app.add_handler(CommandHandler("km", km, filters.ChatType.GROUPS))
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.run_polling()
 

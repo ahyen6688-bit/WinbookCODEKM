@@ -7,7 +7,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes
 )
-from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_ID, CHANNEL_ID
+from config import BOT_TOKEN, TOTAL_SLOTS, ADMIN_IDS, CHANNEL_ID
 
 DATA_FILE = "data.json"
 
@@ -114,7 +114,7 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     auto_daily_reset(data)
 
-    if uid == ADMIN_ID or chat_type == "private":
+    if uid in ADMIN_IDS: or chat_type == "private":
         await start(update, context)
         return
 

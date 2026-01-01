@@ -106,6 +106,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # ================== /KM ==================
+# ================== /KM ==================
 async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
     user = update.effective_user
@@ -119,33 +120,32 @@ async def km(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # chặn vĩnh viễn
-if uid in data.get("users_all", []):
-    await update.message.reply_text(
-        "❌ Bạn đã nhận khuyến mãi trước đó rồi.\n"
-        "👉 Mỗi tài khoản chỉ được nhận 1 lần duy nhất."
-    )
-    return
+    if uid in data.get("users_all", []):
+        await update.message.reply_text(
+            "❌ Bạn đã nhận khuyến mãi trước đó rồi.\n"
+            "👉 Mỗi tài khoản chỉ được nhận 1 lần duy nhất."
+        )
+        return
 
-# đủ slot trong ngày
-if data["count"] >= TOTAL_SLOTS:
-    await update.message.reply_text(
-        "❌ Hôm nay đã đủ 100 người.\n👉 Vui lòng quay lại ngày mai."
-    )
-    return
+    # đủ slot trong ngày
+    if data["count"] >= TOTAL_SLOTS:
+        await update.message.reply_text(
+            "❌ Hôm nay đã đủ 100 người.\n👉 Vui lòng quay lại ngày mai."
+        )
+        return
 
-# tính slot
-data["count"] += 1
-data["users_today"].append(uid)
-data["users_all"].append(uid)
-save_data(data)
-
-
+    # tính slot
+    data["count"] += 1
+    data["users_today"].append(uid)
+    data["users_all"].append(uid)
+    save_data(data)
 
     slot_number = data["count"]
     joined = await is_channel_member(context, uid)
 
     await notify_admin_km(context, user, slot_number, joined)
     await start(update, context)
+
 
 # ================== CALLBACK ==================
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -74,7 +74,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = (
         "🔥🔥 WINBOOK – LÀM NHIỆM VỤ NHẬN 48K TIỀN THẬT 🔥🔥\n\n"
-        "📅 THỜI GIAN SỰ KIỆN: 01/01 – 05/01/2026\n\n"
+        "📅 THỜI GIAN SỰ KIỆN HÔM NAY CHO ĐẾN NGÀY THÔNG BÁO KẾT THÚC\n\n"
         "🎁 KHUYẾN MÃI HÔM NAY DÀNH CHO 100 NGƯỜI\n"
         f"👥 ĐÃ NHẬN: {data['count']}/{TOTAL_SLOTS}\n\n"
         "📣 YÊU CẦU THAM GIA:\n"
